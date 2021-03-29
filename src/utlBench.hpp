@@ -35,6 +35,7 @@ namespace utl
                     : mIterations(iterations)
                     , maxStrLength(0)
                     , mTimeUnit(Nano)
+                    , mPrecision(2)
                 {
                 }
 
@@ -44,8 +45,7 @@ namespace utl
 
                 void add(const std::string& testName, void func(void))
                 {
-                    if(testName.length() > maxStrLength)
-                        maxStrLength = testName.length();
+                    maxStrLength = std::max(maxStrLength, testName.length());
                     mFunctions.emplace_back(testName, func);
                 }
 
@@ -63,12 +63,12 @@ namespace utl
 
                     std::cout << "Running on " << getCpu() << std::endl;
                     std::cout << "Iterations: " << mIterations << std::endl << std::endl;
-                    std::cout  << std::setw(10) << "Benchmark\t" << std::setw(10) << "Min\t" << std::setw(10) << "Max\t" << std::setw(10) << "Avg" << std::setw(0) << std::endl;
+                    std::cout  << std::setw(maxStrLength) << "Benchmark\t" << std::setw(10) << "Min\t" << std::setw(10) << "Max\t" << std::setw(10) << "Avg" << std::setw(0) << std::endl;
                     for(auto& r : results) {
-                        std::cout<< std::setw(10) << r.name << "\t"<< std::fixed
-                                 << std::setw(10) << r.min / static_cast<double>(mTimeUnit) << tuStr << "\t"
-                                 << std::setw(10) << r.max / static_cast<double>(mTimeUnit) << tuStr << "\t"
-                                 << std::setw(10) << r.avg / static_cast<double>(mTimeUnit) << tuStr
+                        std::cout<< std::setw(maxStrLength) << r.name << "\t"<< std::fixed
+                                 << std::setw(10) << std::setprecision(mPrecision) << r.min / static_cast<double>(mTimeUnit) << tuStr << "\t"
+                                 << std::setw(10) << std::setprecision(mPrecision) << r.max / static_cast<double>(mTimeUnit) << tuStr << "\t"
+                                 << std::setw(10) << std::setprecision(mPrecision) << r.avg / static_cast<double>(mTimeUnit) << tuStr
                                  << std::endl;
                     }
                 }
@@ -90,6 +90,16 @@ namespace utl
                     mIterations = iterations;
                 }
 
+                const std::size_t getPrecision() const
+                {
+                    return mPrecision;
+                }
+
+                void setPrecision(const std::size_t precision)
+                {
+                    mPrecision = precision;
+                }
+
                 const TimeUnit getTimeUnit() const
                 {
                     return mTimeUnit;
@@ -109,7 +119,7 @@ namespace utl
                     Result(const std::string& name, const double min, const double max, const double avg)
                         : name(name)
                         , min(min)
-                        ,max(max)
+                        , max(max)
                         , avg(avg)
                     {}
                 };
@@ -118,6 +128,7 @@ namespace utl
                 std::vector<Result> results;
                 std::size_t maxStrLength;
                 TimeUnit mTimeUnit;
+                std::size_t mPrecision;
 
                 void exec(const bool log)
                 {
