@@ -57,20 +57,21 @@ namespace utl {
     return s1 == s2;
   }
 
-  static std::vector<std::string> split(const std::string& str, const std::string& delimiter) {
-    std::vector<std::string> results;
-    std::string s(str);
-    std::string token;
-    std::size_t pos = 0;
+  static void split(const std::string& str, const char& delimiter, std::vector<std::string>& results) {
+    std::size_t index = 0;
+    std::size_t i = 0;
+    std::size_t startIndex = 0;
+    std::size_t endIndex = 0;
 
-    while ((pos = s.find(delimiter)) != std::string::npos) {
-      token = s.substr(0, pos);
-      results.emplace_back(token);
-      s.erase(0, pos + delimiter.length());
+    while (i <= str.length()) {
+      if (str[i] == delimiter || i == str.length()) {
+        endIndex = i;
+        results.emplace_back(str.substr(startIndex, endIndex - startIndex));
+        index++;
+        startIndex = endIndex + 1;
+      }
+      i++;
     }
-    results.emplace_back(s);
-
-    return results;
   }
 
 }
