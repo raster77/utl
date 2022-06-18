@@ -14,7 +14,10 @@
 namespace utl {
 
   enum TimeUnit {
-    Nano = 1, Micro = 1000, Milli = 1000000, Second = 1000000000
+    Nano = 1,
+    Micro = 1000,
+    Milli = 1000000,
+    Second = 1000000000
   };
 
   class Bench {
@@ -71,12 +74,12 @@ namespace utl {
         file << "{";
         file << "\"title\": \"" << title << "\",";
         file << "\"tu\": \"" << timeUnitToStr(mTimeUnit) << "\",";
-        file << "\"data\": [";
+        file << "\"benchmarks\": [";
         std::size_t idx = 0;
         for (auto &r : results) {
-          file << "[\"" << r.name << "\", " << std::fixed
-              << std::setprecision(mPrecision)
-              << r.avg / static_cast<double>(mTimeUnit) << "]";
+          file << "{\"name\":\"" << r.name << "\", " << "\"result\":"
+              << std::fixed << std::setprecision(mPrecision)
+              << r.avg / static_cast<double>(mTimeUnit) << "}";
 
           if (idx < results.size() - 1) {
             file << ",";
