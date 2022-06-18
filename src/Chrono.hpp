@@ -7,6 +7,8 @@ namespace utl {
 
   class Chrono {
 
+    public:
+
       Chrono(const bool autoStart = false)
         : mStart{}
         , mDuration(0)
@@ -99,13 +101,13 @@ namespace utl {
       static constexpr double TO_MICRO = 1000.0;
       static constexpr double TO_MILLI = TO_MICRO * 1000.0;
       static constexpr double TO_SEC = TO_MILLI * 1000.0;
-      std::chrono::time_point<clock> mStart;
+      std::chrono::time_point<std::chrono::steady_clock> mStart;
       double mDuration;
       bool mRunning;
 
       double getDuration() {
         const std::chrono::duration<double, std::nano> isZero = mStart
-            - std::chrono::time_point<clock> {};
+            - std::chrono::time_point<std::chrono::steady_clock> {};
 
         if (isZero.count() > 0) {
           return (std::chrono::steady_clock::now() - mStart).count();
