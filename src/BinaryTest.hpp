@@ -21,6 +21,9 @@ namespace utl {
 
   class BinaryTest {
     public:
+
+      enum class ShowTest { ALL, ERRORS };
+
       BinaryTest(const std::string& title = "Test", const bool enhancedDisplay = false)
         : maxSize(0)
         , mTitle(title)
@@ -39,7 +42,7 @@ namespace utl {
         mTitle = title;
       }
 
-      void run() {
+      void run(const ShowTest& show) {
         std::size_t passed = 0;
         std::size_t failed = 0;
         const std::string_view ok = mEnhancedDisplay ? "\x1b[1;32m\u2713" : "";
@@ -53,27 +56,34 @@ namespace utl {
 
           const bool b = t.expectedResult == t.func();
           b ? passed++ : failed++;
-          std::cout << (b ? ok : ko)
-              << (mEnhancedDisplay ? "\x1b[0;37m" : "")
-              << std::setw(maxSize + 2)
-              << std::left
-              << t.name << ": "
-              << std::setw(6)
-              << std::right
-              << (t.expectedResult == t.func() ? passedStr : failedStr);
+          if(show == ShowTest::ALL || (show == ShowTest::ERRORS && !b)) {
+            std::cout << (b ? ok : ko)
+                << "  "
+                << (mEnhancedDisplay ? "\x1b[0;37m" : "")
+                << std::setw(maxSize + 2)
+                << std::left
+                << t.name << ": "
+                << std::setw(6)
+                << std::right
+                << (b ? passedStr : failedStr);
+          }
         }
-        std::cout << std::endl
-            << std::right
+
+        if(failed > 0 || show == ShowTest::ALL) {
+          std::cout << std::endl;
+        }
+
+        std::cout << std::right
             << (mEnhancedDisplay ? "\x1b[0;37m" : "")
-            << "Total tests : "
+            << "  Total tests : "
             << tests.size()
             << std::endl;
         std::cout << std::setw(15)
             << std::left
-            << "  Passed : "
+            << "       Passed : "
             << passed << std::endl;
         std::cout << std::setw(15)
-            << std::left << "  Failed : "
+            << std::left << "       Failed : "
             << failed << std::endl;
 
         if (mEnhancedDisplay) {
