@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <random>
+#include <type_traits>
 
 namespace utl {
 
@@ -12,10 +13,10 @@ namespace utl {
 
       public:
         ARandomNumberGenerator()
-          : mGenerator(mRndDevice()) {
+            : mGenerator(mRndDevice()) {
         }
 
-        ~ARandomNumberGenerator() {
+        virtual ~ARandomNumberGenerator() {
         }
 
       protected:
@@ -25,7 +26,7 @@ namespace utl {
 
   }
 
-  template<typename T>
+  template<typename T, typename = typename std::enable_if<std::is_floating_point<T>::value, T>::type>
     class RealNumberGenerator : public abs::ARandomNumberGenerator {
 
       public:
@@ -53,8 +54,11 @@ namespace utl {
         }
 
         T number() {
-          setDistributionParams(0, 1);
           return mDist(mGenerator);
+        }
+
+        void setDistribution(const T a, const T b) {
+          setDistributionParams(a, b);
         }
 
       private:
@@ -67,14 +71,14 @@ namespace utl {
         }
     };
 
-  template<typename T>
+  template<typename T, typename = typename std::enable_if<std::is_integral<T>::value, T>::type>
     class IntegerNumberGenerator : public abs::ARandomNumberGenerator {
 
       public:
 
-      IntegerNumberGenerator()
-        : ARandomNumberGenerator()
-        , mDist(0, 1) {
+        IntegerNumberGenerator()
+          : ARandomNumberGenerator()
+          , mDist(0, 1) {
         }
 
         ~IntegerNumberGenerator() {
@@ -95,8 +99,11 @@ namespace utl {
         }
 
         T number() {
-          setDistributionParams(0, 1);
           return mDist(mGenerator);
+        }
+
+        void setDistribution(const T a, const T b) {
+          setDistributionParams(a, b);
         }
 
       private:
@@ -109,20 +116,66 @@ namespace utl {
         }
     };
 
-  typedef RealNumberGenerator<float> FloatNumberGenerator;
-  typedef RealNumberGenerator<double> DoubleNumberGenerator;
+  template<typename T>
+    class RealRng {
 
-  typedef IntegerNumberGenerator<int64_t> Int64NumberGenerator;
-  typedef IntegerNumberGenerator<int32_t> Int32NumberGenerator;
-  typedef IntegerNumberGenerator<int16_t> Int16NumberGenerator;
-  typedef IntegerNumberGenerator<int8_t> Int8NumberGenerator;
-  typedef IntegerNumberGenerator<uint64_t> UInt64NumberGenerator;
-  typedef IntegerNumberGenerator<uint32_t> UInt32NumberGenerator;
-  typedef IntegerNumberGenerator<uint16_t> UInt16NumberGenerator;
-  typedef IntegerNumberGenerator<uint8_t> UInt8NumberGenerator;
+      public:
+
+        static T number() {
+          return realNumberGen.number();
+        }
+
+        static void setDistribution(const T a) {
+          realNumberGen.setDistribution(-a, a);
+        }
+
+        static void setDistribution(const T a, const T b) {
+          realNumberGen.setDistribution(a, b);
+        }
+
+      private:
+        static RealNumberGenerator<T> realNumberGen;
+    };
+
+  template<typename T>
+    RealNumberGenerator<T> RealRng<T>::realNumberGen;
+
+  template<typename T>
+    class IntegerRng {
+
+      public:
+
+        static T number() {
+          return intNumberGen.number();
+        }
+
+        static void setDistribution(const T a) {
+          intNumberGen.setDistribution(-a, a);
+        }
+
+        static void setDistribution(const T a, const T b) {
+          intNumberGen.setDistribution(a, b);
+        }
+
+      private:
+        static IntegerNumberGenerator<T> intNumberGen;
+    };
+
+  template<typename T>
+  IntegerNumberGenerator<T> IntegerRng<T>::intNumberGen;
+
+  using RngFloat = RealRng<float>;
+  using RngDouble = RealRng<double>;
+  using RngUInt8 = IntegerRng<uint8_t>;
+  using RngInt8 = IntegerRng<int8_t>;
+  using RngUInt16 = IntegerRng<uint16_t>;
+  using RngInt16 = IntegerRng<int16_t>;
+  using RngUInt32 = IntegerRng<uint32_t>;
+  using RngInt32 = IntegerRng<int32_t>;
+  using RngUInt64 = IntegerRng<uint64_t>;
+  using RngInt64 = IntegerRng<int64_t>;
 
 }
 
 #endif /* RNG_RANDOMNUNMBERGENERATOR_HPP_ */
-
 
