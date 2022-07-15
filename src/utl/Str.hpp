@@ -51,13 +51,13 @@ namespace utl {
     return s;
   }
 
-  static bool equalsIgnoreCase(const std::string& str1, const std::string& str2) {
+  static inline bool equalsIgnoreCase(const std::string& str1, const std::string& str2) {
     std::string s1 = toLower(str1);
     std::string s2 = toLower(str2);
     return s1 == s2;
   }
 
-  static void split(const std::string& str, const char& delimiter, std::vector<std::string>& results) {
+  static inline void split(const std::string& str, const char& delimiter, std::vector<std::string>& results) {
     std::size_t index = 0;
     std::size_t i = 0;
     std::size_t startIndex = 0;
