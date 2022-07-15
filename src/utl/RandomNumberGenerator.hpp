@@ -107,11 +107,11 @@ namespace utl {
         }
 
       private:
-        std::uniform_real_distribution<T> mDist;
+        std::uniform_int_distribution<T> mDist;
 
         void setDistributionParams(const T a, const T b) {
           if (mDist.param().a() != a || mDist.param().b() != b) {
-            mDist = std::uniform_real_distribution<T>(a, b);
+            mDist = std::uniform_int_distribution<T>(a, b);
           }
         }
     };
